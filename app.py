@@ -519,7 +519,7 @@ with st.sidebar:
     else:
         uci_id = st.number_input("ID do Dataset (UCI)", min_value=1, value=186, step=1)
 
-    if st.button("📥 Carregar Dados", use_container_width=True):
+    if st.button("📥 Carregar Dados", width='stretch'):
         with st.spinner("Carregando..."):
             try:
                 if source == "Arquivo Local" and uploaded_file:
@@ -565,13 +565,13 @@ with tabs[0]:
             'Únicos': int(df_raw[c].nunique(dropna=True)),
             'Amostra': ' | '.join(df_raw[c].dropna().astype(str).head(3).tolist())[:60]
         })
-    st.dataframe(pd.DataFrame(info_cols), use_container_width=True, height=300)
+    st.dataframe(pd.DataFrame(info_cols), width='stretch', height=300)
 
     with st.expander("📋 Estatísticas descritivas", expanded=True):
-        st.dataframe(df_raw.describe().T.round(4), use_container_width=True)
+        st.dataframe(df_raw.describe().T.round(4), width='stretch')
 
     with st.expander("🔍 Outliers (IQR)"):
-        st.dataframe(iqr_outlier_summary(df_raw).round(4), use_container_width=True)
+        st.dataframe(iqr_outlier_summary(df_raw).round(4), width='stretch')
 
     st.subheader("📈 Visualizações")
     num_cols = list(df_raw.select_dtypes(include=np.number).columns)
@@ -652,7 +652,7 @@ with tabs[1]:
                             except ValueError: pass
                     manual_maps[col] = mapa
 
-        if st.button("✅ Aplicar Codificação", use_container_width=True, type='primary'):
+        if st.button("✅ Aplicar Codificação", width='stretch', type='primary'):
             with st.spinner("Codificando..."):
                 df_enc, relatorio = apply_categorical_encoding(df_raw, encoding_map,
                                                                 ordinal_orders, manual_maps)
@@ -661,7 +661,7 @@ with tabs[1]:
                 st.session_state['encoding_ready'] = True
                 st.success(f"✅ Dataset final: {df_enc.shape[0]} linhas × {df_enc.shape[1]} colunas")
                 st.dataframe(pd.DataFrame(relatorio, columns=['Coluna', 'Método', 'Resultado']),
-                             use_container_width=True)
+                             width='stretch')
 
 # ============ TAB 3: MODELAGEM ============
 with tabs[2]:
@@ -736,7 +736,7 @@ with tabs[2]:
                     except ValueError: out.append(tok)
             return out or [1]
 
-        if st.button("▶️ Executar Análise de Regressão", use_container_width=True, type='primary'):
+        if st.button("▶️ Executar Análise de Regressão", width='stretch', type='primary'):
             grids = {'C_lin': parse_list(C_lin), 'eps_lin': parse_list(eps_lin),
                      'C_rbf': parse_list(C_rbf), 'gamma_rbf': parse_list(gamma_rbf),
                      'eps_rbf': parse_list(eps_rbf)}
@@ -784,7 +784,7 @@ with tabs[2]:
                                 all_classifiers,
                                 default=all_classifiers[:min(top_n, len(all_classifiers))])
 
-        if st.button("▶️ Executar Classificação", use_container_width=True, type='primary'):
+        if st.button("▶️ Executar Classificação", width='stretch', type='primary'):
             if not chosen:
                 st.error("Selecione pelo menos um classificador."); st.stop()
             df_sub = df_model[features + [target]].dropna(subset=[target])
@@ -831,7 +831,7 @@ with tabs[3]:
             })
         df_tab = pd.DataFrame(rows).sort_values('CV R² médio', ascending=False)
         st.subheader("📋 Tabela Comparativa")
-        st.dataframe(df_tab, use_container_width=True)
+        st.dataframe(df_tab, width='stretch')
 
         best_cv = df_tab.iloc[0]['Modelo']
         st.success(f"🏆 **Melhor modelo (R² médio na CV):** {best_cv}")
@@ -872,13 +872,13 @@ with tabs[3]:
         st.subheader("📦 Boxplot Interativo — R² por Dobra da CV")
         st.caption("💡 Passe o mouse para ver detalhes, dê zoom, ou clique na legenda para isolar um modelo.")
         fig_box, box_df = plotly_boxplot_regression(valid)
-        st.plotly_chart(fig_box, use_container_width=True)
+        st.plotly_chart(fig_box, width='stretch')
 
         # Tabela detalhada por dobra
         with st.expander("🔍 Ver dados do boxplot (R² por dobra)"):
             st.dataframe(box_df.pivot_table(index='Modelo', columns='Fold',
                                              values='R²').round(4),
-                         use_container_width=True)
+                         width='stretch')
 
     # ================= CLASSIFICAÇÃO =================
     else:
@@ -897,7 +897,7 @@ with tabs[3]:
             })
         df_tab = pd.DataFrame(rows).sort_values('F1-Score', ascending=False)
         st.subheader("📋 Tabela Comparativa")
-        st.dataframe(df_tab, use_container_width=True, height=400)
+        st.dataframe(df_tab, width='stretch', height=400)
 
         if not df_tab.empty:
             best_name = df_tab.iloc[0]['Classificador']
@@ -926,21 +926,21 @@ with tabs[3]:
         fig_box1, fig_box2, metr_df, fold_df = plotly_boxplot_classification(valid)
 
         st.markdown("**1) Distribuição das métricas entre os classificadores**")
-        st.plotly_chart(fig_box1, use_container_width=True)
+        st.plotly_chart(fig_box1, width='stretch')
 
         if fig_box2 is not None:
             st.markdown("**2) Acurácia por dobra da CV — Top 15 classificadores**")
-            st.plotly_chart(fig_box2, use_container_width=True)
+            st.plotly_chart(fig_box2, width='stretch')
 
             with st.expander("🔍 Ver dados de acurácia por dobra"):
                 pivot = fold_df.pivot_table(index='Classificador', columns='Fold',
                                              values='Acurácia').round(4)
-                st.dataframe(pivot, use_container_width=True)
+                st.dataframe(pivot, width='stretch')
 
         with st.expander("🔍 Ver dados das métricas por classificador"):
             st.dataframe(metr_df.pivot_table(index='Modelo', columns='Métrica',
                                               values='Valor').round(4),
-                         use_container_width=True)
+                         width='stretch')
 
     # ================= EXPORTAÇÃO =================
     st.divider()
@@ -950,7 +950,7 @@ with tabs[3]:
         csv = df_tab.to_csv(index=False).encode('utf-8')
         st.download_button("📥 Baixar resultados (.csv)", csv,
                             file_name=f"resultados_{datetime.now():%Y%m%d_%H%M%S}.csv",
-                            mime='text/csv', use_container_width=True)
+                            mime='text/csv', width='stretch')
     with c2:
         export = {'tarefa': r['task'], 'alvo': r['target'],
                   'features': r['features'],
@@ -961,7 +961,7 @@ with tabs[3]:
         js = json.dumps(export, indent=2, default=str).encode('utf-8')
         st.download_button("📥 Baixar relatório (.json)", js,
                             file_name=f"relatorio_{datetime.now():%Y%m%d_%H%M%S}.json",
-                            mime='application/json', use_container_width=True)
+                            mime='application/json', width='stretch')
 
 # ---------- Rodapé ----------
 st.divider()
