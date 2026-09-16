@@ -1,0 +1,26 @@
+# Ambiente virtual
+.venv/
+venv/
+env/
+
+# Build do PyInstaller
+build/
+dist/
+*.spec
+
+# Caches do Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Dados locais (se tiver)
+*.xlsx
+*.csv
+*.json
+
+# Configuração do VSCode
+.vscode/
+
+# Sistema
+Thumbs.db
+.DS_Store
